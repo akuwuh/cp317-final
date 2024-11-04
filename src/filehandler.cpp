@@ -24,19 +24,22 @@ bool NameFileHandler::readFile() {
 
     while (std::getline(file, line)) {
         std::stringstream ss(line);
-        std::string id, firstName, lastName;
+        std::string id, fullName;
         
+        // Get ID (everything before comma) and full name (everything after comma)
         std::getline(ss, id, ',');
-        std::getline(ss, firstName, ',');
-        std::getline(ss, lastName);
+        std::getline(ss, fullName);
 
+        // Remove whitespace from ID
         id.erase(remove_if(id.begin(), id.end(), isspace), id.end());
-        firstName.erase(remove_if(firstName.begin(), firstName.end(), isspace), firstName.begin());
-        lastName.erase(remove_if(lastName.begin(), lastName.end(), isspace), lastName.begin());
-
+        
+        // Remove leading/trailing whitespace from name
+        fullName.erase(0, fullName.find_first_not_of(" \t"));
+        fullName.erase(fullName.find_last_not_of(" \t") + 1);
+        
         Student student;
         student.id = id;
-        student.name = firstName + " " + lastName;
+        student.name = fullName;
         students[id] = student;
     }
 
