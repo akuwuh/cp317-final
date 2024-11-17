@@ -19,8 +19,6 @@ bool NameFileHandler::readFile() {
     }
 
     std::string line;
-    // Skip header line
-    std::getline(file, line);
 
     while (std::getline(file, line)) {
         std::stringstream ss(line);
@@ -59,7 +57,6 @@ bool CourseFileHandler::readFile() {
     }
 
     std::string line;
-    std::getline(file, line); // Skip header
 
     while (std::getline(file, line)) {
         std::stringstream ss(line);

@@ -8,7 +8,7 @@
 struct Student {
     std::string id;
     std::string name;
-    std::map<std::string, std::vector<double> > courses;
+    std::unordered_map<std::string, std::vector<double> > courses;
 };
 
 #endif
