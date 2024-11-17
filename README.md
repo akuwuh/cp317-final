@@ -42,3 +42,4 @@ finally to clean:
 ```
 make clean
 ```
+still have to add testing module for grade calculator + modify grade calculator
