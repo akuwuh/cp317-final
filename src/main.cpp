@@ -2,12 +2,15 @@
 #include "gradecalculator.h"
 #include <iostream>
 #include <string>
+#include <cassert>
 
 int main(int argc, char *argv[]) {
     std::string nameFilePath;
     std::string courseFilePath;
     std::string outputFilePath;
-    
+
+    assert(argc == 1 or argc == 4);  
+
     if (argc == 1) {
         nameFilePath = "../input/NameFile.txt";
         courseFilePath = "../input/CourseFile.txt";
@@ -16,9 +19,6 @@ int main(int argc, char *argv[]) {
         nameFilePath = argv[1]; 
         courseFilePath = argv[2];
         outputFilePath = argv[3];
-    } else {
-        std::cerr << "Error not enough arguments" << std::endl;
-        return 1;
     }
 
     std::map<std::string, Student> students;

@@ -13,6 +13,7 @@ NameFileHandler::NameFileHandler(const std::string& fname, std::map<std::string,
 
 bool NameFileHandler::readFile() {
     std::ifstream file(filename);
+    
     if (!file.is_open()) {
         std::cerr << "Error opening name file: " << filename << std::endl;
         return false;

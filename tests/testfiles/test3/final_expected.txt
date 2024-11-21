@@ -1,0 +1,3 @@
+007 Michael Jordan Economics,85.6 Psychology,78.9
+008 Ada Lovelace Mathematics,96.3 CS,93.4
+009 Neil Armstrong Astronomy,90.3 Geology,84.7

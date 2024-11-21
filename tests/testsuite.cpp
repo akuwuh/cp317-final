@@ -2,6 +2,7 @@
 #include <iostream>
 #include <sstream>
 #include <fstream>
+#include <cassert>
 
 TestSuite::TestSuite(std::string name) : name(name), passed(0), total(0) {
     this->setupTestData();
@@ -84,13 +85,71 @@ bool loadTestStudentsExpected(const std::string& filename, std::map<std::string,
     return true;
 }
 
+// Function to load test students from a file
+bool loadFinalStudentsExpected(const std::string& filename, std::map<int, StudentFinal>& testFinalStudentsExpected) {
+    std::ifstream infile(filename);
+    if (!infile.is_open()) {
+        std::cerr << "Error: Unable to open file '" << filename << "' for reading." << std::endl;
+        return false;
+    }
+
+    std::string line;
+    while (std::getline(infile, line)) {
+        line = trim(line);
+
+        // skip
+        if (line.empty() || line[0] == '#') {
+            continue;
+        }
+
+        std::stringstream ss(line);
+        std::string id, first_name, last_name;
+        
+        // id + full name
+        ss >> id >> first_name >> last_name;
+        std::string full_name = first_name + " " + last_name;
+
+        // init
+        StudentFinal student;
+        student.id = stoi(id);
+        student.name = full_name;
+
+        // courses
+        std::string course_entry;
+        while (ss >> course_entry) {
+            // delimited by commas 
+            std::vector<std::string> tokens = split(course_entry, ',');
+            if (tokens.empty()) {
+                continue; // skip if no tokens 
+            }
+
+            std::string course_name = tokens[0];
+            double grade = stod(tokens[1]);
+
+
+            student.courses[course_name] = grade;
+        }
+
+        testFinalStudentsExpected[stoi(id)] = student;
+    }
+
+    infile.close();
+    return true;
+}
+
 void TestSuite::printResult(const std::string& testName, bool passed) {
-    std::cout << (passed ? "[PASS] " : "[FAIL] ") << testName << std::endl;
+    if (passed) std::cout << "[PASS] " << testName << std::endl;
 }
 
 void TestSuite::setupTestData() {
     std::string expectedDataFile = "./testfiles/" + this->name + "/students_expected.txt";
     if (!loadTestStudentsExpected(expectedDataFile, this->testStudentsExpected)) {
+        std::cerr << "Error: Failed to load expected test data from '" << expectedDataFile << "'." << std::endl;
+        throw std::runtime_error("Failed to load test data.");
+    }
+
+    std::string expectedFinalDataFile = "./testfiles/" + this->name + "/final_expected.txt";
+    if (!loadFinalStudentsExpected(expectedFinalDataFile, this->testFinalStudentsExpected)) {
         std::cerr << "Error: Failed to load expected test data from '" << expectedDataFile << "'." << std::endl;
         throw std::runtime_error("Failed to load test data.");
     }
@@ -176,8 +235,8 @@ bool verifyCourseFileStudentMap(const std::map<std::string, Student>& input, con
 // have to run after nameFileHandler
 bool TestSuite::testCourseFileHandlerRead() {
     std::string inputFile = "./testfiles/" + this->name + "/courses.txt";
-    CourseFileHandler courseHandler(inputFile, this->testStudents);
     try {
+        CourseFileHandler courseHandler(inputFile, this->testStudents);
         if (!courseHandler.readFile()) {
             std::cerr << "[FAIL] testCourseFileHandlerRead: Unable to read course file." << std::endl;
             return false;
@@ -192,9 +251,50 @@ bool TestSuite::testCourseFileHandlerRead() {
     }
 }
 
-bool TestSuite::testGradeCalculatorOutput() {
+
+bool verifyGradeCalculatorStudentMap(const std::map<int, StudentFinal>& input, const std::map<int, StudentFinal>& expected, const std::string& testName) {
+    if (input.size() != expected.size()) { // size mismatch
+        std::cerr << "[FAIL] " << testName << ": Size mismatch." << std::endl;
+        std::cerr << "\tExpected: " << expected.size() << std::endl; 
+        std::cerr << "\tGot: " << input.size() << std::endl;
+        return false;
+    }
+
+    for (const auto& [id, student] : input) {
+        for (const auto& [courseCode, finalGrade] : student.courses) {
+            if (student.courses != expected.at(id).courses) {
+                std::cerr << "[FAIL] " << testName << ": Courses Mismatch for " << student.id << "" << std::endl;
+                std::cerr << "\tExpected: \n";
+                for (const auto& [k, v] : expected.at(id).courses) {
+                    std::cerr << "\t" << k << ": " << v;
+                }
+                std::cerr << std::endl;
+                std::cerr << "\tGot: \n";
+                for (const auto& [k, v] : student.courses) {
+                    std::cerr << "\t" << k << ": " << v;
+                }
+                std::cerr << std::endl;
+                return false;
+            }
+        }
+    }
     
+    return true;
 }
+
+ bool TestSuite::testGradeCalculatorConstructor() {
+    try {
+        GradeCalculator gradeCalculator(this->testStudentsExpected);
+        if (!verifyGradeCalculatorStudentMap(gradeCalculator.finalStudents, this->testFinalStudentsExpected, "testGradeCalculatorConstructor")) {
+            return false;
+        }
+        return true; // Ensure return value on success
+    } catch (const std::exception& e) {
+        std::cout << "[FAIL] testGradeCalculatorConstructor: " << e.what() << std::endl;
+        return false;
+    }
+ }
+
 
 void TestSuite::runAllTests() {
     total = 0;
@@ -211,11 +311,11 @@ void TestSuite::runAllTests() {
     total++;
     if (result) passed++;
     printResult("Course File Handler Read Test", result);
-    
-    result = testGradeCalculatorOutput();
+
+    result = testGradeCalculatorConstructor();
     total++;
     if (result) passed++;
-    printResult("Grade Calculator Output Test", result);
+    printResult("Grade Calculator Constructor Test", result);
 }
 
 

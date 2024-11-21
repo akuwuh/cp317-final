@@ -1,0 +1,3 @@
+010 Marie Curie Physics,94.3 Chemistry,90.4
+011 Leonardo daVinci Art,88.6 Mathematics,93.2
+012 Frida Kahlo Literature,86.3 Psychology,80.6

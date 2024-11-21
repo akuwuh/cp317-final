@@ -5,14 +5,21 @@
 #include <map>
 #include <string>
 
+#include "../tests/testsuite.h"
+
 class GradeCalculator {
 private:
-    std::map<std::string, Student>& students;
+    std::map<int, StudentFinal> finalStudents;
+    std::vector<int> orderedId; 
     double calculateFinalGrade(const std::vector<double>& grades);
 
 public:
     GradeCalculator(std::map<std::string, Student>& studs);
     bool writeOutputFile(const std::string& outputFilename);
+
+    friend class TestSuite; 
 };
+
+
 
 #endif

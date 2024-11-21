@@ -14,6 +14,8 @@ private:
     int total;
     std::map<std::string, Student> testStudents;  
     std::map<std::string, Student> testStudentsExpected; 
+    std::map<int, StudentFinal> testFinalStudentsExpected; 
+
     
     void printResult(const std::string& testName, bool passed);
     
@@ -23,7 +25,7 @@ private:
     // Individual test methods
     bool testNameFileHandlerRead();
     bool testCourseFileHandlerRead();
-    bool testGradeCalculatorOutput();
+    bool testGradeCalculatorConstructor();
 
 public:
     TestSuite(std::string name);

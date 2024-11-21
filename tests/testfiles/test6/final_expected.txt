@@ -1,0 +1,3 @@
+016 Stephen Hawking Astronomy,92.5 Mathematics,90.2
+017 Virginia Woolf Literature,87.4 History,82.4
+018 Nikola Tesla Physics,94.7 EE,92.4
